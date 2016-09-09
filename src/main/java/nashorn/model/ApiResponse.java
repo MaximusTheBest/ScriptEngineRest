@@ -3,6 +3,7 @@ package nashorn.model;
 public class ApiResponse {
 
 	public ApiResponse() {
+		
 	}
 
 	public enum Status {
