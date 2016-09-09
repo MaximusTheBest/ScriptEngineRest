@@ -5,8 +5,12 @@ import java.util.concurrent.Callable;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
-public class ScriptThread implements Callable<String> {
+import nashorn.model.ApiResponse;
+import nashorn.model.ApiResponse.Status;
+
+public class ScriptThread implements Callable<ApiResponse> {
 
 	private final ScriptEngine scriptEngine;
 
@@ -22,10 +26,19 @@ public class ScriptThread implements Callable<String> {
 	}
 
 	@Override
-	public String call() throws Exception {
+	public ApiResponse call() {
 		scriptEngine.getContext().setWriter(stringWriter);
-		scriptEngine.eval(script);
-		return stringWriter.toString();
+		try {
+			scriptEngine.eval(script);
+		} catch (ScriptException e) {
+			return new ApiResponse.Builder()
+					.message(e.getMessage())
+					.status(Status.error)
+					.build();
+		}
+		return new ApiResponse.Builder().message(stringWriter.toString())
+				.status(Status.ok)
+				.build();
 	}
 
 }

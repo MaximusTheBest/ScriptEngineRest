@@ -2,6 +2,13 @@ package nashorn.model;
 
 public class ScriptRequest {
 	
+	public ScriptRequest(){
+	}
+
+	public ScriptRequest(String script) {
+		this.script = script;
+	}
+
 	private String script;
 
 	public String getScript() {
@@ -12,7 +19,4 @@ public class ScriptRequest {
 		this.script = script;
 	}
 
-
-	
-	
 }
