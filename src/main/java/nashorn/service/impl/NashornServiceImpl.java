@@ -34,7 +34,7 @@ public class NashornServiceImpl implements NashornService {
 	private ExecutorService ex = Executors.newSingleThreadExecutor();
 
 	@Override
-	public synchronized ApiResponse addScript(String script) {
+	public ApiResponse addScript(String script) {
 		Long id = cacheIncriment();
 		Future<ApiResponse> future = ex.submit(new ScriptThread(script));
 		cache.put(id, future);
