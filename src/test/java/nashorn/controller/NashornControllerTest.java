@@ -105,9 +105,7 @@ public class NashornControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(jsonPath("$.status", is("ok"))).andReturn();
-
 		Thread.sleep(1000);
-		
 		mockMvc.perform(get("/script/" + resultResponse.getMessage())
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
 		        .andExpect(status().isOk())
