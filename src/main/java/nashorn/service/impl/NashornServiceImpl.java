@@ -88,12 +88,18 @@ public class NashornServiceImpl implements NashornService {
 		Future<ApiResponse> future = null;
 		future = cache.getIfPresent(Long.valueOf(id));
 		if (future == null) {
-			return new ApiResponse.Builder().message("Script not found").status(Status.error).build();
+			return new ApiResponse.Builder()
+					.message("Script not found")
+					.status(Status.error)
+					.build();
 		}
 		future.cancel(true);
 		cache.invalidate(Long.valueOf(id));
 		loggerCache.invalidate(Long.valueOf(id));
-		return new ApiResponse.Builder().message("Script deleted").status(Status.ok).build();
+		return new ApiResponse.Builder()
+				.message("Script deleted")
+				.status(Status.ok)
+				.build();
 	}
 
 	private Long cacheIncriment() {

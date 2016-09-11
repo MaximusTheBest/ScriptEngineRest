@@ -40,7 +40,7 @@ public class ScriptThread implements Callable<ApiResponse> {
 			return new ApiResponse.Builder()
 					.status(Status.ok)
 					.build();
-		} catch (ScriptException e) {
+		} catch(ScriptException e) {
 			return new ApiResponse.Builder()
 					.message(e.getMessage())
 					.status(Status.error)
