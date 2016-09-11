@@ -1,14 +1,15 @@
 package nashorn.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -85,7 +86,7 @@ public class NashornControllerTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(jsonPath("$.status", is("ok"))).andExpect(jsonPath("$.result").isNotEmpty()).andReturn();
 	}
-
+	
 	@Test
 	public void testRemoveScriptById() throws Exception {
 		MvcResult mvcResultAddScript = mockMvc
@@ -105,6 +106,8 @@ public class NashornControllerTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(jsonPath("$.status", is("ok"))).andReturn();
 
+		Thread.sleep(1000);
+		
 		mockMvc.perform(get("/script/" + resultResponse.getMessage())
 				.contentType(MediaType.APPLICATION_JSON_VALUE))
 		        .andExpect(status().isOk())

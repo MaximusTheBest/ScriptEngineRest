@@ -1,9 +1,8 @@
 package nashorn.service.impl;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -29,14 +28,14 @@ public class NashornServiceImpl implements NashornService {
 
 	private Cache<Long, Future<ApiResponse>> cache = CacheBuilder.newBuilder().maximumSize(100000).build();
 
-	private Map<Long, String> loggerCache = new LinkedHashMap<Long, String>();
+	public static Cache<Long, StringWriter> loggerCache = CacheBuilder.newBuilder().maximumSize(100000).build();
 
 	private ExecutorService ex = Executors.newSingleThreadExecutor();
 
 	@Override
 	public ApiResponse addScript(String script) {
 		Long id = cacheIncriment();
-		Future<ApiResponse> future = ex.submit(new ScriptThread(script));
+		Future<ApiResponse> future = ex.submit(new ScriptThread(script, id));
 		cache.put(id, future);
 		return new ApiResponse.Builder().message(String.valueOf(id)).status(Status.ok).build();
 
@@ -44,17 +43,19 @@ public class NashornServiceImpl implements NashornService {
 
 	@Override
 	public ApiResponse getResultScriptById(Long id) throws Exception {
-		Future<ApiResponse> future = null;
-		future = cache.getIfPresent(id);
-		if (future == null) {
-			return new ApiResponse.Builder().message("Script not found").status(Status.error).build();
-		}
-		if (future.isDone()) {
-			return future.get();
-
+		StringWriter stringWriter = loggerCache.getIfPresent(id);
+		if (stringWriter == null) {
+			return new ApiResponse.Builder()
+					.message("Script not found")
+					.status(Status.error)
+					.build();
 		} else {
-			return new ApiResponse.Builder().message("This thread is run").status(Status.error).build();
+			return new ApiResponse.Builder()
+					.message(stringWriter.toString())
+					.status(Status.ok)
+					.build();
 		}
+
 	}
 
 	@Override
@@ -63,8 +64,12 @@ public class NashornServiceImpl implements NashornService {
 		for (Entry<Long, Future<ApiResponse>> entry : cache.asMap().entrySet()) {
 			Long key = entry.getKey();
 			Future<ApiResponse> value = entry.getValue();
-			StatusScript response = new StatusScript.Builder().id(key).isFinished(value.isDone())
-					.isCalcel(value.isCancelled()).url(URL + "/script/" + key).build();
+			StatusScript response = new StatusScript.Builder()
+					.id(key)
+					.isFinished(value.isDone())
+					.isCalcel(value.isCancelled())
+					.url(URL + "/script/" + key)
+					.build();
 			listStatusRequest.add(response);
 		}
 		StatusScriptResponse response = new StatusScriptResponse();
@@ -87,6 +92,7 @@ public class NashornServiceImpl implements NashornService {
 		}
 		future.cancel(true);
 		cache.invalidate(Long.valueOf(id));
+		loggerCache.invalidate(Long.valueOf(id));
 		return new ApiResponse.Builder().message("Script deleted").status(Status.ok).build();
 	}
 
