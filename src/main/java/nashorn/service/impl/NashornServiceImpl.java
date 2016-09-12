@@ -102,7 +102,7 @@ public class NashornServiceImpl implements NashornService {
 				.build();
 	}
 
-	private Long cacheIncriment() {
+	private synchronized Long cacheIncriment() {
 		return cache.size() + 1;
 	}
 
